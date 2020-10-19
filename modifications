@@ -1,0 +1,65 @@
+/*
+
+FUNCTION shutterButtons
+
+Copyright (C) 2020 by LiveHabitat <support dot livehabitat dot fr>
+
+*/
+void shutterButtons()
+{
+    int button1 = 12;
+    int button2 = 13;
+    int relay1 = 1;
+    int relay2 = 2;
+    static auto state1 = false;
+    static auto state2 = false;
+    
+    pinMode(button1, INPUT);
+    pinMode(button2, INPUT);
+    //DEBUG_MSG_P(PSTR("Shutter Buttons %u-%u %u-%u\n"), button1, button2, relay1, relay2);
+
+    static Ticker sample;
+    sample.attach_ms(1, [button1, relay1, button2, relay2]() {
+        constexpr auto interval = microsecondsToClockCycles(500ul * 500ul);
+        static auto count1 = 0ul;
+        static auto last1 = ESP.getCycleCount();
+        static auto count2 = 0ul;
+        static auto last2 = ESP.getCycleCount();
+
+        auto current = ESP.getCycleCount();
+
+        if (current - last1 >= interval) {
+            if (count1 < 150 && state1 == false) {
+                state1 = true;
+                relayStatus(relay1, 1);
+                // DEBUG_MSG_P(PSTR("Shutter button1 On\n"));
+            }
+            if (count1 > 150 && state1 == true) {
+                state1 = false;
+                relayStatus(relay1, 0);
+                // DEBUG_MSG_P(PSTR("Shutter button1 Off\n"));
+            }
+            last1 = current;
+            count1 = 0;
+        }
+        if (current - last2 >= interval) {
+            if (count2 < 150 && state2 == false) {
+                state2 = true;
+                relayStatus(relay2, 1);
+                // DEBUG_MSG_P(PSTR("Shutter button2 On\n"));
+            }
+            if (count2 > 150 && state2 == true) {
+                state2 = false;
+                relayStatus(relay2, 0);
+                // DEBUG_MSG_P(PSTR("Shutter button2 Off\n"));
+            }
+            last2 = current;
+            count2 = 0;
+        }
+
+        if (1 == digitalRead(button1))
+            ++count1;
+        if (1 == digitalRead(button2))
+            ++count2;
+    });
+}
