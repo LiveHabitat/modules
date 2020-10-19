@@ -2,7 +2,7 @@
 
 FUNCTION shutterButtons
 
-Copyright (C) 2020 by LiveHabitat <support dot livehabitat dot fr>
+Copyright (C) 2020 by LiveHabitat <support at livehabitat dot fr>
 
 */
 void shutterButtons()
